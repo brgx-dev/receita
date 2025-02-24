@@ -1,10 +1,11 @@
 import os
 import requests
+import zipfile  # Import zipfile module
 from tqdm import tqdm
-from data_fetcher import fetch_folders, download_data
-from data_unzipper import unzip_data
-from dependency_installer import install_dependencies
-from db_utils import setup_postgres_connection, setup_postgres_table_schema, upload_all_data
+from scripts.data_fetcher import fetch_folders, download_data
+from scripts.data_unzipper import unzip_data
+from scripts.dependency_installer import install_dependencies
+from scripts.db_utils import setup_postgres_connection, setup_postgres_table_schema, upload_all_data
 
 def fetch_folders(base_url):
     # Function to fetch available folders from the base URL
@@ -78,8 +79,8 @@ def download_data(selected_folder):
 
 def unzip_data(zip_file_path):
     with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
-        zip_ref.extractall("csv_files")
-    print("Unzipped {} to csv_files/".format(zip_file_path))
+        zip_ref.extractall("unzipped_csv_files")  # Change to the specified folder
+    print("Unzipped {} to unzipped_csv_files/".format(zip_file_path))
 
 def setup_postgres_connection():
     # Function to setup PostgreSQL connection
@@ -142,8 +143,11 @@ def main():
             else:
                 print("Invalid choice.")
         elif choice == '2':
-            zip_file_path = input("Enter the zip file path to unzip: ")
-            unzip_data(zip_file_path)
+            # Automatically unzip all zip files in the csv_files directory
+            for zip_file in os.listdir("csv_files"):
+                if zip_file.endswith(".zip"):
+                    zip_file_path = os.path.join("csv_files", zip_file)
+                    unzip_data(zip_file_path)
 
 if __name__ == "__main__":
     main()
