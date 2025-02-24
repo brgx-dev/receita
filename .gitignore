@@ -1,0 +1,4 @@
+# Ignore csv_files folder
+csv_files/
+__pycache__/
+.DS_Store
