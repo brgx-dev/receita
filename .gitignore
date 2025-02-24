@@ -3,3 +3,4 @@ csv_files/
 unzipped_csv_files
 __pycache__/
 .DS_Store
+.env
