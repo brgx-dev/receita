@@ -3,9 +3,10 @@ import requests
 import zipfile  # Import zipfile module
 from tqdm import tqdm
 import psycopg2  # Import psycopg2 for PostgreSQL connection
-from scripts.data_fetcher import fetch_folders, download_data
-from scripts.dependency_installer import install_dependencies
-from scripts.db_utils import setup_postgres_connection, setup_postgres_table_schema, upload_all_data
+from data_fetcher import fetch_folders, download_data
+from dependency_installer import install_dependencies
+from db_utils import setup_postgres_connection, setup_postgres_table_schema, upload_all_data
+from data_unzipper import unzip_data
 
 def fetch_folders(base_url):
     # Function to fetch available folders from the base URL
@@ -20,7 +21,7 @@ def fetch_folders(base_url):
                 return []  # Return an empty list if all attempts fail
     # Parse the response to extract folder links (this will depend on the HTML structure)
     # For now, let's assume we return a list of folder URLs
-    from bs4 import BeautifulSoup
+    import pandas as pd
 
     response = requests.get(base_url)
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -85,7 +86,9 @@ def unzip_data(zip_file_path):
 def setup_postgres_connection():
     # Function to setup PostgreSQL connection
     host = input("Enter the PostgreSQL host: ")
-    port = input("Enter the PostgreSQL port: ")
+    port = input("Enter the PostgreSQL port (default 5436): ")
+    if not port or not port.isdigit() or int(port) <= 0:
+        port = "5436"  # Set to default if invalid input
     user = input("Enter the PostgreSQL user: ")
     password = input("Enter the PostgreSQL password: ")
     db_name = input("Enter the PostgreSQL database name: ")
@@ -136,7 +139,6 @@ def upload_all_data():
     # Function to upload all data to PostgreSQL
     pass
 
-from bs4 import BeautifulSoup
 import platform
 import subprocess
 
