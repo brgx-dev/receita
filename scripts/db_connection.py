@@ -2,17 +2,6 @@ import psycopg2
 import os
 
 def handle_db_menu():
-    connection = None  # Initialize connection variable
-    while True:
-        print("1 - Setup PostgreSQL Connection")
-        print("2 - Exit")
-        choice = input("Select an option: ")
-        if choice == '1':
-            connection = setup_postgres_connection()
-        elif choice == '2':
-            break
-        else:
-            print("Invalid choice. Please try again.")
     # Function to setup PostgreSQL connection
     host = input("Enter the PostgreSQL host: ")
     port = input("Enter the PostgreSQL port (default 5436): ")
@@ -23,6 +12,7 @@ def handle_db_menu():
     db_name = input("Enter the PostgreSQL database name: ")
 
     # Test the connection
+    connection = None
     try:
         connection = psycopg2.connect(
             host=host,
@@ -35,11 +25,11 @@ def handle_db_menu():
         
         # Check if the database exists, and create it if it does not
         with connection.cursor() as cursor:
-            cursor.execute("SELECT 1 FROM pg_database WHERE datname = 'receita'")
+            cursor.execute("SELECT 1 FROM pg_database WHERE datname = %s", (db_name,))
             exists = cursor.fetchone()
             if not exists:
-                cursor.execute("CREATE DATABASE receita")
-                print("Database 'receita' created.")
+                cursor.execute(f"CREATE DATABASE {db_name}")
+                print(f"Database '{db_name}' created.")
         
         print("All is okay.")
         
@@ -55,7 +45,7 @@ def handle_db_menu():
         print("Connection failed. Not saved to .env file.")
         print(f"Error: {e}")
     finally:
-        if 'connection' in locals():
+        if connection:
             connection.close()  # Close the connection if it was established
 
 def setup_postgres_table_schema():

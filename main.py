@@ -10,7 +10,7 @@ def main():
     while True:
         print("1 - Download Dados da Receita")
         print("2 - Extrair Dados da Receita")
-        print("3 - Configurar a Conexão com o Postgres")
+        print("2 - Configurar a Conexão com o Postgres")
         print("3 - Exit")
         choice = input("Select an option: ")
         if choice == '1':
@@ -18,7 +18,7 @@ def main():
         elif choice == '2':
             handle_db_menu()
         elif choice == '3':
-            break
+            handle_db_menu()
         else:
             print("Invalid choice. Please try again.")
 
