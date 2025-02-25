@@ -1,15 +1,31 @@
 import psycopg2
 import os
+from dotenv import load_dotenv
+
+def load_env_variables():
+    """Load environment variables from .env file."""
+    load_dotenv()  # Load environment variables from .env file
+    env_vars = {
+        "DB_HOST": os.getenv("DB_HOST"),
+        "DB_PORT": os.getenv("DB_PORT"),
+        "DB_USER": os.getenv("DB_USER"),
+        "DB_PASS": os.getenv("DB_PASS"),
+        "DB_NAME": os.getenv("DB_NAME"),
+    }
+    print("Loaded environment variables:", env_vars)  # Debugging statement
+    return env_vars
 
 def handle_db_menu():
-    # Function to setup PostgreSQL connection
-    host = input("Enter the PostgreSQL host: ")
-    port = input("Enter the PostgreSQL port (default 5436): ")
-    if not port or not port.isdigit() or int(port) <= 0:
-        port = "5436"  # Set to default if invalid input
-    user = input("Enter the PostgreSQL user: ")
-    password = input("Enter the PostgreSQL password: ")
-    db_name = input("Enter the PostgreSQL database name: ")
+    env_vars = load_env_variables()
+    host = env_vars.get("DB_HOST")
+    port = env_vars.get("DB_PORT")
+    user = env_vars.get("DB_USER")
+    password = env_vars.get("DB_PASS")
+    db_name = env_vars.get("DB_NAME")
+
+    if not host or not port or not user or not password or not db_name:
+        print("One or more environment variables are missing. Please check the .env file.")
+        return
 
     # Test the connection
     connection = None
@@ -33,7 +49,7 @@ def handle_db_menu():
         
         print("All is okay.")
         
-        # Save to .env file
+        # Save to .env file only if the connection is successful
         with open('.env', 'w') as env_file:
             env_file.write(f"DB_HOST={host}\n")
             env_file.write(f"DB_PORT={port}\n")
