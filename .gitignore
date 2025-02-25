@@ -1,6 +1,7 @@
 # Ignore csv_files folder
 csv_files/
-unzipped_csv_files
+unzipped_csv_files/
+venv/
 __pycache__/
 .DS_Store
 .env
