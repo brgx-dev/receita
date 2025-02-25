@@ -1,10 +1,29 @@
 import psycopg2
-from psycopg2 import sql
+import os
 
-def connect_to_db(host, port, user, password, db_name):
-    print("Attempting to connect to the database...")
+def handle_db_menu():
+    connection = None  # Initialize connection variable
+    while True:
+        print("1 - Setup PostgreSQL Connection")
+        print("2 - Exit")
+        choice = input("Select an option: ")
+        if choice == '1':
+            connection = setup_postgres_connection()
+        elif choice == '2':
+            break
+        else:
+            print("Invalid choice. Please try again.")
+    # Function to setup PostgreSQL connection
+    host = input("Enter the PostgreSQL host: ")
+    port = input("Enter the PostgreSQL port (default 5436): ")
+    if not port or not port.isdigit() or int(port) <= 0:
+        port = "5436"  # Set to default if invalid input
+    user = input("Enter the PostgreSQL user: ")
+    password = input("Enter the PostgreSQL password: ")
+    db_name = input("Enter the PostgreSQL database name: ")
+
+    # Test the connection
     try:
-        # Attempt to connect to the specified database
         connection = psycopg2.connect(
             host=host,
             port=port,
@@ -12,39 +31,37 @@ def connect_to_db(host, port, user, password, db_name):
             password=password,
             dbname=db_name
         )
-        print(f"Connected to the database '{db_name}' successfully.")
-        print("Connection established.")
-        return connection
-    except psycopg2.OperationalError as e:
-        # Check if the error is due to the database not existing
-        if "database does not exist" in str(e):
-            print(f"Database '{db_name}' does not exist. Attempting to create it...")
-            create_database(host, port, user, password, db_name)  # Create the database if it does not exist
-            print(f"Retrying connection to the database '{db_name}' after creation...")
-            # Retry connection after creating the database
-            return connect_to_db(host, port, user, password, db_name)
-        else:
-            print(f"Connection failed: {e}")
-            return None
+        print("Connection successful. Checking for database...")
+        
+        # Check if the database exists, and create it if it does not
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1 FROM pg_database WHERE datname = 'receita'")
+            exists = cursor.fetchone()
+            if not exists:
+                cursor.execute("CREATE DATABASE receita")
+                print("Database 'receita' created.")
+        
+        print("All is okay.")
+        
+        # Save to .env file
+        with open('.env', 'w') as env_file:
+            env_file.write(f"DB_HOST={host}\n")
+            env_file.write(f"DB_PORT={port}\n")
+            env_file.write(f"DB_USER={user}\n")
+            env_file.write(f"DB_PASS={password}\n")
+            env_file.write(f"DB_NAME={db_name}\n")
 
-def create_database(host, port, user, password, db_name):
-    try:
-        print(f"Attempting to create database '{db_name}'...")
-        # Connect to the default database to create a new one
-        connection = psycopg2.connect(
-            host=host,
-            port=port,
-            user=user,
-            password=password,
-            dbname='postgres'  # Connect to the default 'postgres' database
-        )
-        print("Connection to 'postgres' database established.")
-        connection.autocommit = True  # Enable autocommit mode
-        cursor = connection.cursor()
-        cursor.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(db_name)))
-        print(f"Database '{db_name}' created successfully.")
-        cursor.close()
-        connection.close()
     except Exception as e:
-        print(f"Failed to create database '{db_name}': {e}")
-        print("Error details:", e)
+        print("Connection failed. Not saved to .env file.")
+        print(f"Error: {e}")
+    finally:
+        if 'connection' in locals():
+            connection.close()  # Close the connection if it was established
+
+def setup_postgres_table_schema():
+    # Function to setup PostgreSQL table schema
+    pass
+
+def upload_all_data():
+    # Function to upload all data to PostgreSQL
+    pass
