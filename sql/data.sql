@@ -6,6 +6,42 @@ CREATE TABLE IF NOT EXISTS import_log (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tabela para os arquivos .CNAECSV
+CREATE TABLE IF NOT EXISTS cnae (
+    codigo VARCHAR(15) PRIMARY KEY,
+    descricao VARCHAR(255)
+);
+
+-- Tabela para os arquivos .MOTICSV
+CREATE TABLE IF NOT EXISTS motivo (
+    codigo VARCHAR(15),
+    descricao VARCHAR(255)
+);
+
+-- Tabela para os arquivos .MUNICCSV
+CREATE TABLE IF NOT EXISTS municipio (
+    codigo VARCHAR(15) PRIMARY KEY,
+    descricao VARCHAR(255)
+);
+
+-- Tabela para os arquivos .NATJUCSV
+CREATE TABLE IF NOT EXISTS natureza (
+    codigo VARCHAR(15) PRIMARY KEY,
+    descricao VARCHAR(255)
+);
+
+-- Tabela para os arquivos .QUALSCSV
+CREATE TABLE IF NOT EXISTS qualificacao (
+    codigo VARCHAR(15) PRIMARY KEY,
+    descricao VARCHAR(255)
+);
+
+-- Tabela para os arquivos .PAISCSV
+CREATE TABLE IF NOT EXISTS pais (
+    codigo VARCHAR(15) PRIMARY KEY,
+    descricao VARCHAR(255)
+);
+
 -- Tabela para os arquivos .ESTABELE
 CREATE TABLE IF NOT EXISTS estabelecimentos (
     cnpj_basico VARCHAR(8),
@@ -50,7 +86,7 @@ CREATE TABLE IF NOT EXISTS empresas (
 
 -- Tabela para os arquivos .SOCIOCSV
 CREATE TABLE IF NOT EXISTS socios (
-    cnpj_basico TEXT,
+    cnpj_basico INT,
     tipo_socio INTEGER,
     nome_socio TEXT,
     cpf_socio TEXT,
@@ -67,7 +103,7 @@ CREATE TABLE IF NOT EXISTS socios (
 
 -- Tabela para os arquivos .SIMPLES.CSV.D50208
 CREATE TABLE IF NOT EXISTS simples (
-    cnpj_basico VARCHAR(8),
+    cnpj_basico INT,
     opcao_pelo_simples VARCHAR(1),
     data_opcao_simples DATE,
     data_exclusao_simples DATE,
@@ -77,50 +113,12 @@ CREATE TABLE IF NOT EXISTS simples (
     FOREIGN KEY (cnpj_basico) REFERENCES empresas(cnpj_basico)
 );
 
-
--- Tabela para os arquivos .CNAECSV
-CREATE TABLE IF NOT EXISTS cnae (
-    codigo VARCHAR(15),
-    descricao VARCHAR(255)
-);
-
-
--- Tabela para os arquivos .QUALSCSV
-CREATE TABLE IF NOT EXISTS qualificacao (
-    codigo VARCHAR(15) PRIMARY KEY,
-    descricao VARCHAR(255)
-);
-
--- Tabela para os arquivos .PAISCSV
-CREATE TABLE IF NOT EXISTS pais (
-    codigo VARCHAR(15) PRIMARY KEY,
-    descricao VARCHAR(255)
-);
-
--- Tabela para os arquivos .NATJUCSV
-CREATE TABLE IF NOT EXISTS natureza (
-    codigo VARCHAR(15) PRIMARY KEY,
-    descricao VARCHAR(255)
-);
-
--- Tabela para os arquivos .MUNICCSV
-CREATE TABLE IF NOT EXISTS municipio (
-    codigo VARCHAR(15) PRIMARY KEY,
-    descricao VARCHAR(255)
-);
-
--- Tabela para os arquivos .MOTICSV
-CREATE TABLE IF NOT EXISTS motivo (
-    codigo VARCHAR(15),
-    descricao VARCHAR(255)
-);
-
 -- Cria as Relações entre as tabelas
 ALTER TABLE estabelecimentos
-DROP CONSTRAINT fk_cnae_fiscal_principal;
+DROP CONSTRAINT IF EXISTS fk_cnae_fiscal_principal;
 
 ALTER TABLE estabelecimentos
-DROP CONSTRAINT fk_cnae_fiscal_secundaria;
+DROP CONSTRAINT IF EXISTS fk_cnae_fiscal_secundaria;
 
 ALTER TABLE estabelecimentos
 ADD CONSTRAINT fk_cnae_fiscal_principal
