@@ -1,5 +1,7 @@
 import psycopg2
 import os
+import logging
+from psycopg2 import pool
 from dotenv import load_dotenv
 
 def load_env_variables():
@@ -23,9 +25,17 @@ def handle_db_menu():
     password = env_vars.get("DB_PASS")
     db_name = env_vars.get("DB_NAME")
 
-    if not host or not port or not user or not password or not db_name:
-        print("One or more environment variables are missing. Please check the .env file.")
-        return
+    # Prompt for missing environment variables
+    if not host:
+        host = input("Please enter the database host: ")
+    if not port:
+        port = input("Please enter the database port: ")
+    if not user:
+        user = input("Please enter the database user: ")
+    if not password:
+        password = input("Please enter the database password: ")
+    if not db_name:
+        db_name = input("Please enter the database name: ")
 
     # Test the connection
     connection = None
@@ -35,15 +45,20 @@ def handle_db_menu():
             port=port,
             user=user,
             password=password,
-            dbname=db_name
+            dbname='postgres'  # Connect to the default database to create a new database
         )
+        connection.autocommit = True  # Set autocommit mode to allow CREATE DATABASE
         print("Connection successful. Checking for database...")
         
         # Check if the database exists, and create it if it does not
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1 FROM pg_database WHERE datname = %s", (db_name,))
-            exists = cursor.fetchone()
-            if not exists:
+            try:
+                exists = cursor.fetchone()
+                if not exists:
+                    cursor.execute(f"CREATE DATABASE {db_name}")  # Create the database
+                    print(f"Database '{db_name}' created.")
+            except psycopg2.errors.InvalidCatalogName:
                 cursor.execute(f"CREATE DATABASE {db_name}")
                 print(f"Database '{db_name}' created.")
         
@@ -60,6 +75,25 @@ def handle_db_menu():
     except Exception as e:
         print("Connection failed. Not saved to .env file.")
         print(f"Error: {e}")
+        if "database" in str(e) and "does not exist" in str(e):
+            print(f"Database '{db_name}' does not exist. Attempting to create it...")
+            # Close the current connection before creating the database
+            if connection:
+                connection.close()
+            # Create a new connection to execute the CREATE DATABASE command
+            connection = psycopg2.connect(
+                host=host,
+                port=port,
+                user=user,
+                password=password,
+                dbname='postgres'  # Connect to the default database to create a new database
+            )
+            with connection.cursor() as cursor:
+                cursor.execute(f"CREATE DATABASE {db_name}")
+                print(f"Database '{db_name}' created.")
+        else:
+            print("Connection failed. Not saved to .env file.")
+            print(f"Error: {e}")
     finally:
         if connection:
             connection.close()  # Close the connection if it was established
