@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS estabelecimentos (
     nome_fantasia VARCHAR(255),
     situacao_cadastral INT,
     data_inicio_atividade DATE,
-    cnae_fiscal_principal VARCHAR(2),
-    cnae_fiscal_secundaria TEXT,
+    cnae_fiscal_principal VARCHAR(15),
+    cnae_fiscal_secundaria VARCHAR(15),
     tipo_logradouro VARCHAR(255),
     logradouro VARCHAR(255),
     numero VARCHAR(255),
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS estabelecimentos (
     bairro VARCHAR(255),
     cep VARCHAR(8),
     uf VARCHAR(2),
-    codigo_municipio INT,
+    codigo_municipio VARCHAR(15),
     ddd_telefone_1 VARCHAR(2),
     telefone_1 VARCHAR(255),
     ddd_telefone_2 VARCHAR(2),
@@ -32,18 +32,20 @@ CREATE TABLE IF NOT EXISTS estabelecimentos (
     ddd_fax VARCHAR(2),
     fax VARCHAR(255),
     email VARCHAR(255),
-    situacao_especial VARCHAR(255)
+    situacao_especial VARCHAR(255),
+    FOREIGN KEY (codigo_municipio) REFERENCES municipio(codigo)
 );
 
 -- Tabela para os arquivos .EMPRECSV
 CREATE TABLE IF NOT EXISTS empresas (
     cnpj_basico INT PRIMARY KEY,
     nome_emprsarial VARCHAR(255),
-    natureza_juridica INT,
+    natureza_juridica VARCHAR(15),
     qual_responsavel INT,
     capital_social NUMERIC(15,2),
     porte INT,
-    ente_federativo VARCHAR(255)
+    ente_federativo VARCHAR(255),
+    FOREIGN KEY (natureza_juridica) REFERENCES natureza(codigo)
 );
 
 -- Tabela para os arquivos .SOCIOCSV
@@ -52,12 +54,15 @@ CREATE TABLE IF NOT EXISTS socios (
     tipo_socio INTEGER,
     nome_socio TEXT,
     cpf_socio TEXT,
-    qualificacao_socio INTEGER,
+    qualificacao_socio VARCHAR(15),
     data_entrada_sociedade INTEGER,
-    pais TEXT,
+    pais VARCHAR(15),
     representante_legal TEXT,
     nome_representante TEXT,
-    faixa_etaria TEXT
+    faixa_etaria TEXT,
+    FOREIGN KEY (cnpj_basico) REFERENCES empresas(cnpj_basico),
+    FOREIGN KEY (qualificacao_socio) REFERENCES qualificacao(codigo),
+    FOREIGN KEY (pais) REFERENCES pais(codigo)
 );
 
 -- Tabela para os arquivos .SIMPLES.CSV.D50208
@@ -68,42 +73,59 @@ CREATE TABLE IF NOT EXISTS simples (
     data_exclusao_simples DATE,
     opcao_mei VARCHAR(1),
     data_opcao_mei DATE,
-    data_exclusao_mei DATE
+    data_exclusao_mei DATE,
+    FOREIGN KEY (cnpj_basico) REFERENCES empresas(cnpj_basico)
 );
 
 
 -- Tabela para os arquivos .CNAECSV
 CREATE TABLE IF NOT EXISTS cnae (
-    codigo VARCHAR(10),
+    codigo VARCHAR(15),
     descricao VARCHAR(255)
 );
 
+
 -- Tabela para os arquivos .QUALSCSV
 CREATE TABLE IF NOT EXISTS qualificacao (
-    codigo VARCHAR(2) PRIMARY KEY,
+    codigo VARCHAR(15) PRIMARY KEY,
     descricao VARCHAR(255)
 );
 
 -- Tabela para os arquivos .PAISCSV
 CREATE TABLE IF NOT EXISTS pais (
-    codigo VARCHAR(3) PRIMARY KEY,
+    codigo VARCHAR(15) PRIMARY KEY,
     descricao VARCHAR(255)
 );
 
 -- Tabela para os arquivos .NATJUCSV
 CREATE TABLE IF NOT EXISTS natureza (
-    codigo VARCHAR(4) PRIMARY KEY,
+    codigo VARCHAR(15) PRIMARY KEY,
     descricao VARCHAR(255)
 );
 
 -- Tabela para os arquivos .MUNICCSV
 CREATE TABLE IF NOT EXISTS municipio (
-    codigo VARCHAR(4) PRIMARY KEY,
+    codigo VARCHAR(15) PRIMARY KEY,
     descricao VARCHAR(255)
 );
 
 -- Tabela para os arquivos .MOTICSV
 CREATE TABLE IF NOT EXISTS motivo (
-    codigo VARCHAR(2),
+    codigo VARCHAR(15),
     descricao VARCHAR(255)
 );
+
+-- Cria as Relações entre as tabelas
+ALTER TABLE estabelecimentos
+DROP CONSTRAINT fk_cnae_fiscal_principal;
+
+ALTER TABLE estabelecimentos
+DROP CONSTRAINT fk_cnae_fiscal_secundaria;
+
+ALTER TABLE estabelecimentos
+ADD CONSTRAINT fk_cnae_fiscal_principal
+FOREIGN KEY (cnae_fiscal_principal) REFERENCES cnae(codigo);
+
+ALTER TABLE estabelecimentos
+ADD CONSTRAINT fk_cnae_fiscal_secundaria
+FOREIGN KEY (cnae_fiscal_secundaria) REFERENCES cnae(codigo);
