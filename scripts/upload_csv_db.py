@@ -4,16 +4,16 @@ import os  # Import os module to use os.path.splitext
 
 def get_table_name(file_path):
     extension_mapping = {
-        '.EMPRESCSV': 'empresa_table',
-        '.ESTABELE': 'estabele_table',
-        '.SOCIOCSV': 'socio_table',
-        '.SIMPLES.CSV': 'simples_table',
-        '.CNAECSV': 'cnae_table',
-        '.MOTICSV': 'motivos_table',
-        '.MUNICCSV': 'municipions_table',
-        '.NATJUCSV': 'naturezas_table',
-        '.PAISCSV': 'pais_table',
-        '.QUALSCSV': 'qual_table',
+        '.EMPRESCSV': 'empresas',
+        '.ESTABELE': 'estabelecimentos',
+        '.SOCIOCSV': 'socios',
+        '.SIMPLES.CSV': 'simples',
+        '.CNAECSV': 'cnae',
+        '.MOTICSV': 'motivo',
+        '.MUNICCSV': 'municipio',
+        '.NATJUCSV': 'natureza',
+        '.PAISCSV': 'pais',
+        '.QUALSCSV': 'qualificacao',
     }
     extension = os.path.splitext(file_path)[1].upper()  # Get the file extension and convert to uppercase
     return extension_mapping.get(extension, 'unknown_table')
