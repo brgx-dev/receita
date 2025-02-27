@@ -11,7 +11,7 @@ def load_env_variables():
         "DB_HOST": os.getenv("DB_HOST"),
         "DB_PORT": os.getenv("DB_PORT"),
         "DB_USER": os.getenv("DB_USER"),
-        "DB_PASS": os.getenv("DB_PASS"),
+        "DB_PASSWORD": os.getenv("DB_PASSWORD"),
         "DB_NAME": os.getenv("DB_NAME"),
     }
     print("Loaded environment variables:", env_vars)  # Debugging statement
@@ -22,7 +22,7 @@ def handle_db_menu():
     host = env_vars.get("DB_HOST")
     port = env_vars.get("DB_PORT")
     user = env_vars.get("DB_USER")
-    password = env_vars.get("DB_PASS")
+    password = env_vars.get("DB_PASSWORD")
     db_name = env_vars.get("DB_NAME")
 
     # Prompt for missing environment variables
@@ -69,7 +69,7 @@ def handle_db_menu():
             env_file.write(f"DB_HOST={host}\n")
             env_file.write(f"DB_PORT={port}\n")
             env_file.write(f"DB_USER={user}\n")
-            env_file.write(f"DB_PASS={password}\n")
+            env_file.write(f"DB_PASSWORD={password}\n")
             env_file.write(f"DB_NAME={db_name}\n")
 
     except Exception as e:
