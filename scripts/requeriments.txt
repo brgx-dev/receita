@@ -3,3 +3,4 @@ pandas
 psycopg2-binary
 tqdm
 beautifulsoup4
+SQLAlchemy
