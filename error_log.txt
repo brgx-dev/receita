@@ -1,0 +1,5 @@
+iconv: : No such file or directory
+iconv: -o: No such file or directory
+iconv: _converted.csv: No such file or directory
+mv: rename _converted.csv to ../upload_files/_converted.csv: No such file or directory
+mv: : No such file or directory
