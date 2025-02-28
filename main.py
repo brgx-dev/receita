@@ -3,7 +3,7 @@ from scripts.data_handler import handle_data_menu
 from scripts.data_unzipper import unzip_data
 from scripts.db_connection import handle_db_menu
 from scripts.tables_creator import create_tables
-from scripts.upload_csv_db import main as organize_files
+from scripts.upload_csv_db import organize_files
 from scripts.prepare_files_for_upload import run_preparation
 
 def main():
