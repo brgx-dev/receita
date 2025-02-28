@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from sqlalchemy import create_engine
 import psycopg2
+import subprocess
 from tqdm import tqdm
 from dotenv import load_dotenv
 
@@ -57,8 +58,8 @@ def upload_csv_files(connection):
                 print(f"Found file: {file_path}")
         for file_path in matching_files:
             print(f"Processing file: {file_path}")
-            for chunk in pd.read_csv(f'unzipped_csv_files/{file_path}', chunksize=50000, on_bad_lines='skip', encoding='ISO-8859-1'):
-                print(f"Reading file: {file_path}")
+            for chunk in pd.read_csv(f'unzipped_csv_files/{file_path}', header=None, chunksize=50000, on_bad_lines='skip', encoding='ISO-8859-1'):
+                # print(f"Reading file: {file_path}")
                 try:
                     chunk.to_sql(table_name, connection, if_exists='append', index=False)
                     # Log the upload in import_log

@@ -4,6 +4,7 @@ from scripts.data_unzipper import unzip_data
 from scripts.db_connection import handle_db_menu
 from scripts.tables_creator import create_tables
 from scripts.upload_csv_db import main as upload_csv
+from scripts.prepare_files_for_upload import run_preparation
 
 def main():
     try:
@@ -13,7 +14,7 @@ def main():
             print("2 - Extrair Dados da Receita")
             print("3 - Connectar ao Banco")
             print("4 - Preparar o Banco (tabelas)")
-            print("5 - Upload CSVs to DB")
+            print("5 - Preparar os Arquivos para Upload")
             choice = input("Escolha uma opção: ")
             if choice == '1':
                 handle_data_menu()
@@ -24,7 +25,8 @@ def main():
             elif choice == '4':
                 create_tables()
             elif choice == '5':
-                upload_csv()
+                run_preparation()
+                
     except Exception as e:
         print(f"An error occurred: {e}")
 
