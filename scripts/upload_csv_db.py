@@ -1,144 +1,35 @@
 import os
-import pandas as pd
-from sqlalchemy import create_engine
-import psycopg2
-import subprocess
-from tqdm import tqdm
-from dotenv import load_dotenv
+import shutil
 
-# Load environment variables
-load_dotenv()
+# Define the mapping of file suffixes to folder names
+file_table_mapping = {
+    ".EMPRECSV": "empresas",
+    ".ESTABELE": "estabelecimentos",
+    ".SOCIOCSV": "socios",
+    ".SIMPLES.CSV": "simples",
+    ".CNAECSV": "cnae",
+    ".MOTICSV": "motivo",
+    ".MUNICCSV": "municipio",
+    ".NATJUCSV": "natureza",
+    ".PAISCSV": "pais",
+    ".QUALSCSV": "qualificacao",
+}
 
-# Database connection information
-DB_USER = os.getenv('DB_USER')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-DB_HOST = os.getenv('DB_HOST')
-DB_PORT = os.getenv('DB_PORT')
-DB_NAME = os.getenv('DB_NAME')
-
-# Create a database connection
-def create_db_connection():
-    try:
-        connection_string = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-        engine = create_engine(connection_string)
-        connection = engine.connect()
-        print("Database connection established.")
-        return connection
-    except Exception as e:
-        print(f"Error connecting to the database: {e}")
-        return None
-
-# Check import log
-def check_import_log(connection):
-    print("Checking import log...")
-    query = "SELECT * FROM import_log"
-    return pd.read_sql(query, connection)
-
-# Upload CSV files to the database
-def get_column_names_from_sql(table_name):
-    with open('sql/data.sql', 'r') as file:
-        sql_content = file.read()
+def organize_files():
+    upload_directory = 'upload_files'
     
-    # Extract column names for the specified table
-    column_names = []
-    table_found = False
-    for line in sql_content.splitlines():
-        if line.startswith(f"CREATE TABLE IF NOT EXISTS {table_name}"):
-            table_found = True
-            continue
-        if table_found and line.startswith(");"):
-            break
-        if table_found and line.strip() and not line.startswith("--"):
-            column_name = line.split()[0]  # Get the first word as the column name
-            column_names.append(column_name)
-    
-    return column_names
-
-def upload_csv_files(connection):
-    column_names = get_column_names_from_sql()
-    file_table_mapping = {
-        ".EMPRESCSV": "empresas",
-        ".ESTABELE": "estabelecimentos",
-        ".SOCIOCSV": "socios",
-        ".SIMPLES.CSV": "simples",
-        ".CNAECSV": "cnae",
-        ".MOTICSV": "motivo",
-        ".MUNICCSV": "municipio",
-        ".NATJUCSV": "natureza",
-        ".PAISCSV": "pais",
-        ".QUALSCSV": "qualificacao",
-    }
-
-    print("Starting the upload process for CSV files.")
-    for file_suffix, table_name in file_table_mapping.items():
-        print(f"Checking for files containing: {file_suffix}")
-        matching_files = [f for f in os.listdir('upload_files') if file_suffix in f]
-        if matching_files:
-            for file_path in matching_files:
-                print(f"Found file: {file_path}")
-        for file_path in matching_files:
-            print(f"Processing file: {file_path}")
-            for chunk in pd.read_csv(f'upload_files/{file_path}', header=None, chunksize=50000, on_bad_lines='skip', encoding='ISO-8859-1'):
-                try:
-                    chunk.to_sql(table_name, connection, if_exists='append', index=False, 
-                                 columns=column_names)
-                    # Log the upload in import_log
-                    log_upload(connection, file_suffix, table_name)
-                    print(f"Successfully uploaded {file_path} to {table_name}.")
-                except pd.errors.ParserError as e:
-                    print(f"Error parsing {file_path}: {e}")
-                except Exception as e:
-                    print(f"Error uploading {file_suffix} to {table_name}: {e}")
-                    print("Upload failed.")
-    file_table_mapping = {
-        ".EMPRESCSV": "empresas",
-        ".ESTABELE": "estabelecimentos",
-        ".SOCIOCSV": "socios",
-        ".SIMPLES.CSV": "simples",
-        ".CNAECSV": "cnae",
-        ".MOTICSV": "motivo",
-        ".MUNICCSV": "municipio",
-        ".NATJUCSV": "natureza",
-        ".PAISCSV": "pais",
-        ".QUALSCSV": "qualificacao",
-    }
-
-    print("Starting the upload process for CSV files.")
-    for file_suffix, table_name in file_table_mapping.items():
-        print(f"Checking for files containing: {file_suffix}")
-        matching_files = [f for f in os.listdir('upload_files') if file_suffix in f]
-        if matching_files:
-            for file_path in matching_files:
-                print(f"Found file: {file_path}")
-        for file_path in matching_files:
-            print(f"Processing file: {file_path}")
-            for chunk in pd.read_csv(f'upload_files/{file_path}', header=None, chunksize=50000, on_bad_lines='skip', encoding='ISO-8859-1'):
-                # print(f"Reading file: {file_path}")
-                try:
-                    chunk.to_sql(table_name, connection, if_exists='append', index=False)
-                    # Log the upload in import_log
-                    log_upload(connection, file_suffix, table_name)
-                    print(f"Successfully uploaded {file_path} to {table_name}.")
-                except pd.errors.ParserError as e:
-                    print(f"Error parsing {file_path}: {e}")
-                except Exception as e:
-                    print(f"Error uploading {file_suffix} to {table_name}: {e}")
-                    print("Upload failed.")
-
-# Log the upload in the import_log table
-def log_upload(connection, file_suffix, table_name):
-    query = f"INSERT INTO import_log (file_name, table_name, upload_time) VALUES ('{file_suffix}', '{table_name}', NOW()) RETURNING id"
-    print(f"Executing query: {query}")
-    with connection.cursor() as cursor:
-        cursor.execute(query)
-    connection.commit()
-
-def main():
-    connection = create_db_connection()
-    if connection:
-        print("Connection established, proceeding to upload CSV files.")
-        upload_csv_files(connection)
-    connection.close()
+    # Scan the upload_files directory
+    for file_suffix, folder_name in file_table_mapping.items():
+        # Create the folder if it doesn't exist
+        folder_path = os.path.join(upload_directory, folder_name)
+        os.makedirs(folder_path, exist_ok=True)
+        
+        # Check for files containing the suffix
+        matching_files = [f for f in os.listdir(upload_directory) if file_suffix in f]
+        for file_name in matching_files:
+            file_path = os.path.join(upload_directory, file_name)
+            print(f"Moving {file_name} to {folder_name} folder.")
+            shutil.move(file_path, folder_path)
 
 if __name__ == "__main__":
-    main()
+    organize_files()
