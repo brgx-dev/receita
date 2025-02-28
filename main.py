@@ -15,6 +15,7 @@ def main():
             print("3 - Connectar ao Banco")
             print("4 - Preparar o Banco (tabelas)")
             print("5 - Preparar os Arquivos para Upload")
+            print("6 - Upload to DB")
             choice = input("Escolha uma opção: ")
             if choice == '1':
                 handle_data_menu()
@@ -26,6 +27,8 @@ def main():
                 create_tables()
             elif choice == '5':
                 run_preparation()
+            elif choice == '6':
+                upload_csv()
                 
     except Exception as e:
         print(f"An error occurred: {e}")
