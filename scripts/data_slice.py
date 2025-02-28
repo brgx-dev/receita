@@ -30,22 +30,28 @@ def slice_files():
         output_file = open(output_file_path, 'w')
         
         for file_path in files:
+            print(f"Processing file: {file_path}")
             try:
                 with open(file_path, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        output_file.write(line)
+                        line_count += 1
+                print(f"Finished processing file: {file_path}")
             except UnicodeDecodeError:
                 with open(file_path, 'r', encoding='ISO-8859-1') as f:
-                for line in f:
-                    output_file.write(line)
-                    line_count += 1
-                    
-                    # Check if we reached 2M lines
-                    if line_count >= 2000000:
-                        output_file.close()
-                        file_index += 1
-                        line_count = 0
-                        output_file_path = os.path.join(folder_path, f"{str(file_index).zfill(3)}_{folder_key}.csv")
-                        print(f"Creating new output file: {output_file_path}")
-                        output_file = open(output_file_path, 'w')
+                    for line in f:
+                        output_file.write(line)
+                        line_count += 1
+                print(f"Finished processing file: {file_path} with ISO-8859-1 encoding")
+        
+            # Check if we reached 2M lines
+            if line_count >= 1000000:
+                output_file.close()
+                file_index += 1
+                line_count = 0
+                output_file_path = os.path.join(folder_path, f"{str(file_index).zfill(3)}_{folder_key}.csv")
+                print(f"Creating new output file: {output_file_path}")
+                output_file = open(output_file_path, 'w')
         
         output_file.close()
         
@@ -53,5 +59,6 @@ def slice_files():
         for file_path in files:
             try:
                 os.remove(file_path)
+                print(f"Deleted file: {file_path}")
             except Exception as e:
                 print(f"Error deleting file {file_path}: {e}")
