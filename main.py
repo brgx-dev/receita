@@ -34,7 +34,7 @@ def main():
                 organize_files()
             elif choice == '7':
                 slice_files()
-            elif choice == '7':
+            elif choice == '8':
                 upload_csv_to_db()
                 
                 

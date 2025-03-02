@@ -2,11 +2,18 @@ import os
 import psycopg2
 import pandas as pd
 
-from db_connection import load_env_variables
+from dotenv import load_dotenv
 
 def connect_to_db():
     """Connect to the PostgreSQL database using environment variables."""
-    env_vars = load_env_variables()
+    load_dotenv()  # Load environment variables from .env file
+    env_vars = {
+        "DB_HOST": os.getenv("DB_HOST"),
+        "DB_PORT": os.getenv("DB_PORT"),
+        "DB_USER": os.getenv("DB_USER"),
+        "DB_PASSWORD": os.getenv("DB_PASSWORD"),
+        "DB_NAME": os.getenv("DB_NAME"),
+    }
     try:
         connection = psycopg2.connect(
             dbname=env_vars['DB_NAME'],
@@ -22,18 +29,29 @@ def connect_to_db():
 
 def get_last_uploaded_file(cursor):
     """Retrieve the last uploaded file from the import_log table."""
-    cursor.execute("SELECT file_name FROM import_log ORDER BY upload_time DESC LIMIT 1;")
+    cursor.execute("SELECT table_name FROM import_log ORDER BY timestamp DESC LIMIT 1;")
     result = cursor.fetchone()
     return result[0] if result else None
 
 def get_table_columns(table_name):
     """Retrieve column names from the SQL file."""
-    with open('sql/data.sql', 'r') as file:
+    with open('../sql/data.sql', 'r') as file:
         sql_content = file.read()
     # Assuming the SQL file contains a CREATE TABLE statement
     # Extract column names based on the table_name
-    # This is a placeholder; implement actual parsing logic as needed
-    return ['column1', 'column2', 'column3']  # Replace with actual column names
+    columns = []
+    lines = sql_content.splitlines()
+    inside_table = False
+    for line in lines:
+        line = line.strip()
+        if line.startswith(f"CREATE TABLE IF NOT EXISTS {table_name}"):
+            inside_table = True
+        elif inside_table and line.startswith(");"):
+            break
+        elif inside_table and line and not line.startswith("--"):
+            column_definition = line.split()[0]  # Get the column name
+            columns.append(column_definition)
+    return columns
 
 def upload_csv_to_db():
     """Upload CSV files to the PostgreSQL database."""
@@ -67,7 +85,7 @@ def upload_csv_to_db():
                             print(f"Error uploading {file}: {e}")
 
                     # Log the upload
-                    cursor.execute("INSERT INTO import_log (folder_name, file_name) VALUES (%s, %s);", (folder, file))
+                    cursor.execute("INSERT INTO import_log (chunk_id, table_name) VALUES (%s, %s);", (file_number, table_name))
                     connection.commit()
 
     cursor.close()
