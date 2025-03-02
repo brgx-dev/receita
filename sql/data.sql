@@ -68,8 +68,7 @@ CREATE TABLE IF NOT EXISTS estabelecimentos (
     ddd_fax VARCHAR(2),
     fax VARCHAR(255),
     email VARCHAR(255),
-    situacao_especial VARCHAR(255),
-    FOREIGN KEY (codigo_municipio) REFERENCES municipio(codigo)
+    situacao_especial VARCHAR(255)
 );
 
 -- Tabela para os arquivos .EMPRECSV
@@ -80,8 +79,7 @@ CREATE TABLE IF NOT EXISTS empresas (
     qual_responsavel TEXT,
     capital_social TEXT,
     porte TEXT,
-    ente_federativo VARCHAR(255),
-    FOREIGN KEY (natureza_juridica) REFERENCES natureza(codigo)
+    ente_federativo VARCHAR(255)
 );
 
 -- Tabela para os arquivos .SOCIOCSV
@@ -95,10 +93,7 @@ CREATE TABLE IF NOT EXISTS socios (
     pais VARCHAR(15),
     representante_legal TEXT,
     nome_representante TEXT,
-    faixa_etaria TEXT,
-    FOREIGN KEY (cnpj_basico) REFERENCES empresas(cnpj_basico),
-    FOREIGN KEY (qualificacao_socio) REFERENCES qualificacao(codigo),
-    FOREIGN KEY (pais) REFERENCES pais(codigo)
+    faixa_etaria TEXT
 );
 
 -- Tabela para os arquivos .SIMPLES.CSV.D50208
@@ -109,21 +104,5 @@ CREATE TABLE IF NOT EXISTS simples (
     data_exclusao_simples DATE,
     opcao_mei VARCHAR(1),
     data_opcao_mei DATE,
-    data_exclusao_mei DATE,
-    FOREIGN KEY (cnpj_basico) REFERENCES empresas(cnpj_basico)
+    data_exclusao_mei DATE
 );
-
--- Cria as Relações entre as tabelas
-ALTER TABLE estabelecimentos
-DROP CONSTRAINT IF EXISTS fk_cnae_fiscal_principal;
-
-ALTER TABLE estabelecimentos
-DROP CONSTRAINT IF EXISTS fk_cnae_fiscal_secundaria;
-
-ALTER TABLE estabelecimentos
-ADD CONSTRAINT fk_cnae_fiscal_principal
-FOREIGN KEY (cnae_fiscal_principal) REFERENCES cnae(codigo);
-
-ALTER TABLE estabelecimentos
-ADD CONSTRAINT fk_cnae_fiscal_secundaria
-FOREIGN KEY (cnae_fiscal_secundaria) REFERENCES cnae(codigo);
