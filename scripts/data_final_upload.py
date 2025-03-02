@@ -35,7 +35,7 @@ def upload_csv_to_db():
                     logging.info(f"Processing folder: {folder}, file: {file}")  # Log the current folder and file
                     # Use copy_from method to upload the CSV data with FORCE QUOTE
                     with open(file, 'r') as f:
-                        cursor.copy_expert(f"COPY {table_name} FROM STDIN WITH CSV DELIMITER ';' QUOTE '\"'", f)
+                        cursor.copy_expert(f"COPY {table_name} FROM STDIN WITH CSV DELIMITER ';' QUOTE '\"' NULL ''", f)
                     connection.commit()
             # Log the upload
             cursor.execute("INSERT INTO import_log (chunk_id, table_name) VALUES (%s, %s)", (1, table_name))  # Assuming chunk_id is 1 for simplicity

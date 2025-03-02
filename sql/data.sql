@@ -1,6 +1,6 @@
 -- Tabela de logs de importação
 CREATE TABLE IF NOT EXISTS import_log (
-    id SERIAL PRIMARY KEY,
+    id SERIAL ,
     chunk_id INT NOT NULL,
     table_name VARCHAR(255) NOT NULL,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS import_log (
 
 -- Tabela para os arquivos .CNAECSV
 CREATE TABLE IF NOT EXISTS cnae (
-    codigo VARCHAR(15) PRIMARY KEY,
+    codigo VARCHAR(15) ,
     descricao VARCHAR(255)
 );
 
@@ -20,25 +20,25 @@ CREATE TABLE IF NOT EXISTS motivo (
 
 -- Tabela para os arquivos .MUNICCSV
 CREATE TABLE IF NOT EXISTS municipio (
-    codigo VARCHAR(15) PRIMARY KEY,
+    codigo VARCHAR(15) ,
     descricao VARCHAR(255)
 );
 
 -- Tabela para os arquivos .NATJUCSV
 CREATE TABLE IF NOT EXISTS natureza (
-    codigo VARCHAR(15) PRIMARY KEY,
+    codigo VARCHAR(15) ,
     descricao VARCHAR(255)
 );
 
 -- Tabela para os arquivos .QUALSCSV
 CREATE TABLE IF NOT EXISTS qualificacao (
-    codigo VARCHAR(15) PRIMARY KEY,
+    codigo VARCHAR(15) ,
     descricao VARCHAR(255)
 );
 
 -- Tabela para os arquivos .PAISCSV
 CREATE TABLE IF NOT EXISTS pais (
-    codigo VARCHAR(15) PRIMARY KEY,
+    codigo VARCHAR(15) ,
     descricao VARCHAR(255)
 );
 
@@ -74,12 +74,12 @@ CREATE TABLE IF NOT EXISTS estabelecimentos (
 
 -- Tabela para os arquivos .EMPRECSV
 CREATE TABLE IF NOT EXISTS empresas (
-    cnpj_basico INT PRIMARY KEY,
+    cnpj_basico INT,
     nome_emprsarial VARCHAR(255),
     natureza_juridica VARCHAR(15),
-    qual_responsavel INT,
-    capital_social DOUBLE PRECISION,
-    porte INT,
+    qual_responsavel TEXT,
+    capital_social TEXT,
+    porte TEXT,
     ente_federativo VARCHAR(255),
     FOREIGN KEY (natureza_juridica) REFERENCES natureza(codigo)
 );
