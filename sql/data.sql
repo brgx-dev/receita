@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS empresas (
     natureza_juridica VARCHAR(15),
     qual_responsavel INT,
     capital_social NUMERIC(15,2),
-    porte INT,
+    porte DOUBLE PRECISION,
     ente_federativo VARCHAR(255),
     FOREIGN KEY (natureza_juridica) REFERENCES natureza(codigo)
 );
