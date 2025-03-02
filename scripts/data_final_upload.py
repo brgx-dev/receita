@@ -75,17 +75,21 @@ def upload_csv_to_db():
                     columns = get_table_columns(table_name)
                     df = pd.read_csv(os.path.join(folder, file))
 
-                    # Insert data into the database
+                    print(f"Preparing to upload {file} to {table_name}...")
+                    print("Loading...")
+                    total_rows = df.shape[0]
                     for index, row in df.iterrows():
-                        insert_query = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({', '.join(['%s'] * len(columns))})"
+                        # Use COPY command to upload the CSV file
                         try:
-                            cursor.execute(insert_query, tuple(row))
+                            cursor.copy_expert(f"COPY {table_name} FROM STDIN WITH CSV HEADER DELIMITER ';'", f)
                             print(f"Successfully uploaded {file} to {table_name}.")
+                            print(f"Total rows uploaded: {df.shape[0]}")
+                            print(f"Current table: {table_name}")
+                            print(f"Processing next file...\n")
                         except Exception as e:
                             print(f"Error uploading {file}: {e}")
-
-                    # Log the upload
-                    cursor.execute("INSERT INTO import_log (chunk_id, table_name) VALUES (%s, %s);", (file_number, table_name))
+                        # Update loading progress
+                        print(f"Loading... {((index + 1) / total_rows) * 100:.2f}% complete")
                     connection.commit()
 
     cursor.close()
