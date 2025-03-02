@@ -6,7 +6,7 @@ from scripts.tables_creator import create_tables
 from scripts.data_organize import organize_files
 from scripts.prepare_files_for_upload import run_preparation
 from scripts.data_slice import slice_files
-
+from scripts.data_final_upload import upload_csv_to_db
 def main():
     try:
         print("Criador do receitaDB iniciado...")
@@ -18,6 +18,7 @@ def main():
             print("5 - Preparar os Arquivos para Upload")
             print("6 - Prepara os Arquivos Part II")
             print("7 - Fatiar os Arquivos")
+            print("8 - Upload Final")
             choice = input("Escolha uma opção: ")
             if choice == '1':
                 handle_data_menu()
@@ -33,6 +34,8 @@ def main():
                 organize_files()
             elif choice == '7':
                 slice_files()
+            elif choice == '7':
+                upload_csv_to_db()
                 
                 
     except Exception as e:
