@@ -21,6 +21,9 @@ def upload_csv_to_db():
     """Upload CSV files to the PostgreSQL database."""
     connection = connect_to_db()
     cursor = connection.cursor()
+    
+    # Set session replication role
+    cursor.execute("SET session_replication_role = 'replica';")
     os.chdir('upload_files')
 
     for folder in sorted(os.listdir()):
