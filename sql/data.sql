@@ -50,7 +50,11 @@ CREATE TABLE IF NOT EXISTS estabelecimentos (
     matriz_filial INT,
     nome_fantasia VARCHAR(255),
     situacao_cadastral INT,
-    data_inicio_atividade DATE,
+    data_situacao_cadastral INT,
+    motivo_situacao_cadastral INT,
+    cidade_exterior VARCHAR(100),
+    pais INT,
+    data_inicio_atividade INT,
     cnae_fiscal_principal VARCHAR(15),
     cnae_fiscal_secundaria VARCHAR(15),
     tipo_logradouro VARCHAR(255),
@@ -60,7 +64,7 @@ CREATE TABLE IF NOT EXISTS estabelecimentos (
     bairro VARCHAR(255),
     cep VARCHAR(8),
     uf VARCHAR(2),
-    codigo_municipio VARCHAR(15),
+    codigo_municipio INT,
     ddd_telefone_1 VARCHAR(2),
     telefone_1 VARCHAR(255),
     ddd_telefone_2 VARCHAR(2),
@@ -68,7 +72,8 @@ CREATE TABLE IF NOT EXISTS estabelecimentos (
     ddd_fax VARCHAR(2),
     fax VARCHAR(255),
     email VARCHAR(255),
-    situacao_especial VARCHAR(255)
+    situacao_especial VARCHAR(255),
+    data_situacao_especial INT
 );
 
 -- Tabela para os arquivos .EMPRECSV
